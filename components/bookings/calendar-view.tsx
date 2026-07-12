@@ -118,17 +118,17 @@ export function CalendarView({ bookings }: CalendarViewProps) {
       </div>
 
       {/* Weekdays Row */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] lg:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
         {weekDays.map((day) => (
-          <div key={day} className="py-2">{day}</div>
+          <div key={day} className="py-1 lg:py-2">{day}</div>
         ))}
       </div>
 
       {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-1 lg:gap-1.5">
         {gridArray.map((day, idx) => {
           if (day === null) {
-            return <div key={`empty-${idx}`} className="bg-slate-50/50 rounded-lg min-h-[90px]" />;
+            return <div key={`empty-${idx}`} className="bg-slate-50/50 rounded-lg min-h-[50px] lg:min-h-[95px]" />;
           }
 
           const dayBookings = getBookingsForDay(day);
@@ -140,24 +140,24 @@ export function CalendarView({ bookings }: CalendarViewProps) {
           return (
             <div
               key={`day-${day}`}
-              className={`border border-slate-100 rounded-lg min-h-[90px] p-2 flex flex-col justify-between hover:bg-slate-50/30 transition-all ${
+              className={`border border-slate-100 rounded-lg min-h-[50px] lg:min-h-[95px] p-1 lg:p-2 flex flex-col justify-between hover:bg-slate-50/30 transition-all ${
                 isToday ? "bg-indigo-50/40 border-indigo-200 ring-1 ring-indigo-200" : "bg-white"
               }`}
             >
               {/* Day Number */}
-              <span className={`text-xs font-bold ${
+              <span className={`text-[10px] lg:text-xs font-bold ${
                 isToday ? "text-indigo-600" : "text-slate-800"
               }`}>
                 {day}
               </span>
 
-              {/* Day Bookings Mini-list */}
-              <div className="mt-1 space-y-1 overflow-y-auto max-h-[60px] scrollbar-thin">
+              {/* Day Bookings Mini-list (Desktop only) */}
+              <div className="hidden lg:block mt-1 space-y-1 overflow-y-auto max-h-[60px] scrollbar-thin">
                 {dayBookings.slice(0, 3).map((b) => (
                   <button
                     key={b.id}
                     onClick={() => setSelectedBooking(b)}
-                    className={`w-full block truncate text-[9px] font-semibold text-white px-1.5 py-0.5 rounded transition-all text-left truncate ${
+                    className={`w-full block truncate text-[9px] font-semibold text-white px-1.5 py-0.5 rounded transition-all text-left cursor-pointer ${
                       statusColors[b.status] || "bg-slate-400"
                     }`}
                     title={`[${b.asset.assetTag}] ${b.asset.name}`}
@@ -169,6 +169,27 @@ export function CalendarView({ bookings }: CalendarViewProps) {
                   <div className="text-[8px] font-bold text-slate-400 text-center">
                     +{dayBookings.length - 3} more
                   </div>
+                )}
+              </div>
+
+              {/* Mobile Dots Indicator (Mobile/Tablet only) */}
+              <div className="flex flex-wrap gap-1 justify-center mt-1 lg:hidden">
+                {dayBookings.slice(0, 3).map((b) => (
+                  <button
+                    key={b.id}
+                    onClick={() => setSelectedBooking(b)}
+                    className={`size-1.5 rounded-full cursor-pointer ${
+                      b.status === "UPCOMING" ? "bg-emerald-500" :
+                      b.status === "ONGOING" ? "bg-blue-500" :
+                      b.status === "COMPLETED" ? "bg-slate-400" : "bg-red-400"
+                    }`}
+                    title={`[${b.asset.assetTag}] ${b.asset.name}`}
+                  />
+                ))}
+                {dayBookings.length > 3 && (
+                  <span className="text-[7px] font-bold text-slate-400 leading-none">
+                    +
+                  </span>
                 )}
               </div>
             </div>
