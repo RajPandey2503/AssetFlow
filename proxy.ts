@@ -4,6 +4,7 @@ import { sessionCookieName } from "@/lib/auth/constants";
 const authRoutes = ["/login", "/signup", "/forgot-password"];
 const protectedPrefixes = [
   "/dashboard",
+  "/organization",
   "/assets",
   "/departments",
   "/employees",
@@ -36,6 +37,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/organization/:path*",
     "/assets/:path*",
     "/departments/:path*",
     "/employees/:path*",

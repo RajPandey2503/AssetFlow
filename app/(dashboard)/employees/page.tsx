@@ -1,10 +1,5 @@
-import { ModulePage } from "@/components/layout/module-page";
+import { redirect } from "next/navigation";
 
 export default function EmployeesPage() {
-  return (
-    <ModulePage
-      title="Employee Directory"
-      description="Manage employee records, departments, account roles, and access status."
-    />
-  );
+  redirect("/organization?tab=employees");
 }

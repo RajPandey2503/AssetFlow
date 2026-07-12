@@ -1,10 +1,5 @@
-import { ModulePage } from "@/components/layout/module-page";
+import { redirect } from "next/navigation";
 
 export default function DepartmentsPage() {
-  return (
-    <ModulePage
-      title="Departments"
-      description="Maintain the organization structure, department heads, and department status."
-    />
-  );
+  redirect("/organization?tab=departments");
 }

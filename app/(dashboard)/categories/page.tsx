@@ -1,10 +1,5 @@
-import { ModulePage } from "@/components/layout/module-page";
+import { redirect } from "next/navigation";
 
 export default function CategoriesPage() {
-  return (
-    <ModulePage
-      title="Asset Categories"
-      description="Maintain category definitions for the AssetFlow registry."
-    />
-  );
+  redirect("/organization?tab=categories");
 }
