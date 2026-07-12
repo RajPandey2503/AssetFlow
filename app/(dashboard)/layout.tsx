@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import Sidebar from "@/components/layout/sidebar";
-import Navbar from "@/components/layout/navbar";
+import DashboardShell from "@/components/layout/dashboard-shell";
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
@@ -73,16 +72,8 @@ export default async function DashboardLayout({
   ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()); // sort newest first
 
   return (
-    <div className="flex h-screen bg-slate-100">
-      <Sidebar />
-
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Navbar user={user} notifications={notifications} />
-
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <DashboardShell user={user} notifications={notifications}>
+      {children}
+    </DashboardShell>
   );
 }

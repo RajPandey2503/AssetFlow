@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { LogOut, Bell, AlertTriangle, Calendar, Wrench } from "lucide-react";
+import { LogOut, Bell, AlertTriangle, Calendar, Wrench, Menu } from "lucide-react";
 import { logoutAction } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,9 +23,16 @@ type NavbarProps = {
     role: keyof typeof roleLabels;
   };
   notifications?: NotificationItem[];
+  sidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 };
 
-export default function Navbar({ user, notifications = [] }: NavbarProps) {
+export default function Navbar({ 
+  user, 
+  notifications = [], 
+  sidebarOpen = true, 
+  onToggleSidebar 
+}: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +68,26 @@ export default function Navbar({ user, notifications = [] }: NavbarProps) {
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white px-6 relative z-40 shadow-sm">
-      <h2 className="text-xl font-semibold text-slate-800">Dashboard</h2>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="rounded-lg p-1.5 hover:bg-slate-100 text-slate-600 focus:outline-none cursor-pointer"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="size-5" />
+        </button>
+        
+        {!sidebarOpen && (
+          <div className="flex items-center gap-2 hidden lg:flex">
+            <div className="flex size-8 items-center justify-center rounded-md bg-slate-900 text-[10px] font-bold text-white">
+              AF
+            </div>
+            <span className="text-sm font-bold text-slate-900 mr-2">AssetFlow</span>
+          </div>
+        )}
+
+        <h2 className="text-lg font-semibold text-slate-800">ERP Console</h2>
+      </div>
 
       <div className="flex items-center gap-4">
         {/* Notification Center Trigger */}

@@ -12,8 +12,8 @@ try {
     exports: {},
     paths: [],
     children: [],
-  } as any;
-} catch (e) {
+  } as unknown as NodeModule;
+} catch {
   // If not found, ignore
 }
 
@@ -32,8 +32,8 @@ try {
     },
     paths: [],
     children: [],
-  } as any;
-} catch (e) {
+  } as unknown as NodeModule;
+} catch {
   // If not found, ignore
 }
 
@@ -47,14 +47,14 @@ try {
     exports: {
       redirect: (url: string) => {
         const err = new Error("NEXT_REDIRECT");
-        (err as any).digest = `NEXT_REDIRECT;307;${url};`;
+        (err as unknown as { digest: string }).digest = `NEXT_REDIRECT;307;${url};`;
         throw err;
       },
     },
     paths: [],
     children: [],
-  } as any;
-} catch (e) {
+  } as unknown as NodeModule;
+} catch {
   // If not found, ignore
 }
 
