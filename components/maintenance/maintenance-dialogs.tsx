@@ -27,11 +27,12 @@ import {
    ========================================== */
 type RequestProps = {
   assets: { id: string; assetTag: string; name: string }[];
+  defaultOpen?: boolean;
 };
 
-export function RequestMaintenanceDialog({ assets }: RequestProps) {
+export function RequestMaintenanceDialog({ assets, defaultOpen }: RequestProps) {
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger
         render={
           <Button variant="default" />

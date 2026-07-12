@@ -96,7 +96,7 @@ export default async function AllocationPage({ searchParams }: AllocationPagePro
         </div>
         {canManage && (
           <div className="flex-shrink-0">
-            <AllocateDialog assets={availableAssets} employees={activeEmployees} />
+            <AllocateDialog assets={availableAssets} employees={activeEmployees} defaultOpen={params.new === "true"} />
           </div>
         )}
       </div>

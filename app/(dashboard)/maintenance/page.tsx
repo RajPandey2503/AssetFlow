@@ -123,7 +123,7 @@ export default async function MaintenancePage({ searchParams }: MaintenancePageP
           </p>
         </div>
         <div className="flex-shrink-0">
-          <RequestMaintenanceDialog assets={assets} />
+          <RequestMaintenanceDialog assets={assets} defaultOpen={params.new === "true"} />
         </div>
       </div>
 

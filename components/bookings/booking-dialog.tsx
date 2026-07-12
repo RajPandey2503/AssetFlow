@@ -20,9 +20,10 @@ import { createBookingAction } from "@/lib/bookings/actions";
 type BookingDialogProps = {
   assets: { id: string; assetTag: string; name: string }[];
   employees: { id: string; name: string; email: string }[];
+  defaultOpen?: boolean;
 };
 
-export function BookingDialog({ assets, employees }: BookingDialogProps) {
+export function BookingDialog({ assets, employees, defaultOpen }: BookingDialogProps) {
   // Format current datetime for min date input (YYYY-MM-DDTHH:MM)
   const getMinDateTimeString = () => {
     const now = new Date();
@@ -35,7 +36,7 @@ export function BookingDialog({ assets, employees }: BookingDialogProps) {
   };
 
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger
         render={
           <Button variant="default" />

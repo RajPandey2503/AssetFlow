@@ -166,7 +166,7 @@ export default async function AssetsPage({ searchParams }: AssetsPageProps) {
         </div>
         {canManage && (
           <div className="flex-shrink-0">
-            <AssetFormDialog mode="create" categories={categories} />
+            <AssetFormDialog mode="create" categories={categories} defaultOpen={params.new === "true"} />
           </div>
         )}
       </div>

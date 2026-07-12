@@ -38,6 +38,7 @@ type AssetFormDialogProps = {
     locationY?: number | null;
   };
   categories: { id: string; name: string }[];
+  defaultOpen?: boolean;
 };
 
 const formatDateForInput = (date: Date | null | undefined) => {
@@ -50,7 +51,7 @@ const formatDateForInput = (date: Date | null | undefined) => {
   return `${year}-${month}-${day}`;
 };
 
-export function AssetFormDialog({ mode, asset, categories }: AssetFormDialogProps) {
+export function AssetFormDialog({ mode, asset, categories, defaultOpen }: AssetFormDialogProps) {
   const isEdit = mode === "edit";
   
   // Local state for mock file uploads
@@ -73,7 +74,7 @@ export function AssetFormDialog({ mode, asset, categories }: AssetFormDialogProp
   };
 
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger
         render={
           <Button variant={isEdit ? "outline" : "default"} size={isEdit ? "sm" : "default"} />

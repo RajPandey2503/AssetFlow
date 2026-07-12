@@ -20,11 +20,12 @@ import { allocateAssetAction } from "@/lib/allocation/actions";
 type AllocateDialogProps = {
   assets: { id: string; assetTag: string; name: string }[];
   employees: { id: string; name: string; email: string }[];
+  defaultOpen?: boolean;
 };
 
-export function AllocateDialog({ assets, employees }: AllocateDialogProps) {
+export function AllocateDialog({ assets, employees, defaultOpen }: AllocateDialogProps) {
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger
         render={
           <Button variant="default" />

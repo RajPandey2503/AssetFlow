@@ -114,7 +114,7 @@ export default async function BookingsPage({ searchParams }: BookingsPageProps) 
               </Button>
             </form>
           )}
-          <BookingDialog assets={sharedAssets} employees={employees} />
+          <BookingDialog assets={sharedAssets} employees={employees} defaultOpen={params.new === "true"} />
         </div>
       </div>
 
