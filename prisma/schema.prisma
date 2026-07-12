@@ -29,10 +29,23 @@ enum UserStatus {
   SUSPENDED
 }
 
+enum DepartmentStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model Department {
   id        String   @id @default(cuid())
   name      String
   code      String   @unique
+  status    DepartmentStatus @default(ACTIVE)
+
+  parentDepartmentId String?
+  parentDepartment   Department? @relation("DepartmentToParent", fields: [parentDepartmentId], references: [id])
+  childDepartments   Department[] @relation("DepartmentToParent")
+
+  departmentHeadId   String?
+  departmentHead     User? @relation("DepartmentHead", fields: [departmentHeadId], references: [id])
 
   employees User[]
   assets    Asset[]
@@ -54,15 +67,30 @@ model User {
   departmentId String?
   department   Department? @relation(fields: [departmentId], references: [id])
 
-  allocations  AssetAllocation[]
+  headedDepartments   Department[] @relation("DepartmentHead")
+  allocations         AssetAllocation[]
+  transfersFrom       TransferRequest[] @relation("FromUser")
+  transfersTo         TransferRequest[] @relation("ToUser")
+  transferRequests    TransferRequest[] @relation("RequestedBy")
+  bookings            Booking[]
+  assignedMaintenance MaintenanceRecord[] @relation("TechnicianAssigned")
+  assignedAudits      AuditCycle[] @relation("AssignedAudits")
+  createdAudits       AuditCycle[] @relation("CreatedAudits")
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model AssetCategory {
-  id     String @id @default(cuid())
-  name   String @unique
+  id          String @id @default(cuid())
+  name        String @unique
+  description String?
+  status      CategoryStatus @default(ACTIVE)
 
   assets Asset[]
 }
@@ -75,6 +103,14 @@ model Asset {
 
   serialNumber String?
 
+  acquisitionDate DateTime?
+  acquisitionCost Float?
+  condition       AssetCondition @default(GOOD)
+  location        String?
+  sharedResource  Boolean        @default(false)
+  imagePath       String?
+  documentPath    String?
+
   status       AssetStatus @default(AVAILABLE)
 
   categoryId   String
@@ -84,6 +120,11 @@ model Asset {
   department   Department? @relation(fields: [departmentId], references: [id])
 
   allocations  AssetAllocation[]
+  transfers    TransferRequest[]
+  bookings     Booking[]
+  maintenance  MaintenanceRecord[]
+  auditItems   AuditItem[]
+  history      AssetHistory[]
 
   createdAt    DateTime @default(now())
 }
@@ -99,6 +140,121 @@ model AssetAllocation {
 
   allocatedAt DateTime @default(now())
   returnDate  DateTime?
+  returnedAt  DateTime?
 
   returned    Boolean @default(false)
 }
+
+enum AssetCondition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+  BROKEN
+}
+
+model AssetHistory {
+  id          String   @id @default(cuid())
+  assetId     String
+  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  action      String
+  details     String
+  changedBy   String?
+  createdAt   DateTime @default(now())
+}
+
+model TransferRequest {
+  id            String   @id @default(cuid())
+  assetId       String
+  asset         Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  fromUserId    String
+  fromUser      User     @relation("FromUser", fields: [fromUserId], references: [id])
+  toUserId      String
+  toUser        User     @relation("ToUser", fields: [toUserId], references: [id])
+  status        String   @default("PENDING")
+  requestedById String
+  requestedBy   User     @relation("RequestedBy", fields: [requestedById], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum BookingStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model Booking {
+  id           String   @id @default(cuid())
+  assetId      String
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startTime    DateTime
+  endTime      DateTime
+  status       BookingStatus @default(UPCOMING)
+  needReminder Boolean  @default(false)
+  reminderSent Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum MaintenanceStatus {
+  PENDING
+  APPROVED
+  TECHNICIAN_ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+}
+
+model MaintenanceRecord {
+  id           String   @id @default(cuid())
+  assetId      String
+  asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  description  String
+  status       MaintenanceStatus @default(PENDING)
+  technicianId String?
+  technician   User?    @relation("TechnicianAssigned", fields: [technicianId], references: [id])
+  cost         Float?
+  notes        String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AuditCycle {
+  id           String      @id @default(cuid())
+  name         String
+  status       String      @default("ACTIVE")
+  dueDate      DateTime
+  
+  auditorId    String
+  auditor      User        @relation("AssignedAudits", fields: [auditorId], references: [id])
+
+  createdById  String
+  createdBy    User        @relation("CreatedAudits", fields: [createdById], references: [id])
+
+  items        AuditItem[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model AuditItem {
+  id           String      @id @default(cuid())
+  auditCycleId String
+  auditCycle   AuditCycle  @relation(fields: [auditCycleId], references: [id], onDelete: Cascade)
+  assetId      String
+  asset        Asset       @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  verified     Boolean     @default(false)
+  verifiedAt   DateTime?
+  status       String      @default("PENDING")
+  notes        String?
+}
+
+
+
+
+
