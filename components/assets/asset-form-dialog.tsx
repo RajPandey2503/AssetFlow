@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Pencil, Plus, Upload, X, FileText, Image as ImageIcon } from "lucide-react";
+import { Pencil, Plus, Upload, X, FileText, Image as ImageIcon, Scan } from "lucide-react";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { Button } from "@/components/ui/button";
+import { ScannerDialog } from "@/components/ui/scanner-dialog";
+import { FloorplanSelector } from "@/components/assets/floorplan-selector";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +34,8 @@ type AssetFormDialogProps = {
     categoryId: string;
     imagePath: string | null;
     documentPath: string | null;
+    locationX?: number | null;
+    locationY?: number | null;
   };
   categories: { id: string; name: string }[];
 };
@@ -52,6 +56,7 @@ export function AssetFormDialog({ mode, asset, categories }: AssetFormDialogProp
   // Local state for mock file uploads
   const [imageName, setImageName] = useState<string | null>(asset?.imagePath || null);
   const [docName, setDocName] = useState<string | null>(asset?.documentPath || null);
+  const [serial, setSerial] = useState(asset?.serialNumber || "");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -129,12 +134,25 @@ export function AssetFormDialog({ mode, asset, categories }: AssetFormDialogProp
               <label className="text-sm font-medium" htmlFor={`asset-serial-${asset?.id ?? "new"}`}>
                 Serial Number
               </label>
-              <Input
-                id={`asset-serial-${asset?.id ?? "new"}`}
-                name="serialNumber"
-                defaultValue={asset?.serialNumber ?? ""}
-                placeholder="e.g. CN-0X3892-XYZ"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id={`asset-serial-${asset?.id ?? "new"}`}
+                  name="serialNumber"
+                  value={serial}
+                  onChange={(e) => setSerial(e.target.value)}
+                  placeholder="e.g. CN-0X3892-XYZ"
+                  className="flex-1"
+                />
+                <ScannerDialog
+                  placeholderPrefix="SN-"
+                  onScan={(val) => setSerial(val)}
+                  trigger={
+                    <Button type="button" variant="outline" size="icon" title="Scan Barcode" className="shrink-0">
+                      <Scan className="size-4" />
+                    </Button>
+                  }
+                />
+              </div>
             </div>
 
             {/* Status */}
@@ -215,6 +233,14 @@ export function AssetFormDialog({ mode, asset, categories }: AssetFormDialogProp
                 placeholder="0.00"
               />
             </div>
+          </div>
+
+          {/* Visual Floor plan location pin selector */}
+          <div className="border border-slate-250 rounded-xl p-4 bg-white shadow-xs">
+            <FloorplanSelector
+              initialX={asset?.locationX}
+              initialY={asset?.locationY}
+            />
           </div>
 
           {/* Shared Resource Flag */}

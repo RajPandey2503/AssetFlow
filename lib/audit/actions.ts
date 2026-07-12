@@ -3,6 +3,7 @@
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { sendSlackAlert } from "@/lib/notifications/slack";
 
 function value(formData: FormData, key: string) {
   const formValue = formData.get(key);
@@ -218,6 +219,20 @@ export async function verifyAuditItemAction(formData: FormData) {
         });
       }
     });
+
+    if (status === "MISSING") {
+      await sendSlackAlert(
+        `Audit Discrepancy: Asset Missing - ${item.asset.assetTag}`,
+        `Asset "${item.asset.name}" was marked as MISSING during audit "${item.auditCycle.name}" by auditor ${actor.name}.\n• Status set to: LOST\n• Notes: ${notes || "None"}`,
+        "danger"
+      );
+    } else if (status === "DAMAGED") {
+      await sendSlackAlert(
+        `Audit Discrepancy: Asset Damaged - ${item.asset.assetTag}`,
+        `Asset "${item.asset.name}" was marked as DAMAGED during audit "${item.auditCycle.name}" by auditor ${actor.name}.\n• Condition set to: BROKEN\n• Notes: ${notes || "None"}`,
+        "warning"
+      );
+    }
 
     redirectWithToast(`Asset ${item.asset.assetTag} successfully verified.`, "success", "cycles");
   } catch (error) {

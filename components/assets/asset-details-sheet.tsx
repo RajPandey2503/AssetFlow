@@ -15,6 +15,7 @@ import {
   Download,
   Info,
 } from "lucide-react";
+import { FloorplanSelector } from "@/components/assets/floorplan-selector";
 import {
   Sheet,
   SheetContent,
@@ -49,6 +50,8 @@ type AssetDetailsSheetProps = {
     category: { name: string };
     imagePath: string | null;
     documentPath: string | null;
+    locationX?: number | null;
+    locationY?: number | null;
     history: HistoryRecord[];
   };
   trigger: React.ReactElement;
@@ -230,6 +233,17 @@ export function AssetDetailsSheet({ asset, trigger }: AssetDetailsSheetProps) {
               )}
             </div>
           </div>
+
+          {/* Floor Plan Location Pin */}
+          {asset.locationX !== null && asset.locationX !== undefined && asset.locationY !== null && asset.locationY !== undefined && (
+            <div className="space-y-3 pt-2">
+              <FloorplanSelector
+                initialX={asset.locationX}
+                initialY={asset.locationY}
+                readOnly
+              />
+            </div>
+          )}
 
           {/* Audit History Timeline */}
           <div className="space-y-4">

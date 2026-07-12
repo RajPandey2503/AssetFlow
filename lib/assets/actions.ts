@@ -1,8 +1,8 @@
 "use server";
 
 import { Prisma } from "@/app/generated/prisma/client";
-
 import { requireAuth } from "@/lib/auth/session";
+import { sendSlackAlert } from "@/lib/notifications/slack";
 import { prisma } from "@/lib/prisma";
 import { assetSchema } from "@/lib/assets/validation";
 import { redirect } from "next/navigation";
@@ -60,6 +60,8 @@ export async function createAssetAction(formData: FormData) {
       status: value(formData, "status") || "AVAILABLE",
       imagePath: value(formData, "imagePath"),
       documentPath: value(formData, "documentPath"),
+      locationX: value(formData, "locationX"),
+      locationY: value(formData, "locationY"),
     });
 
     // Generate sequential asset tag (AF-XXXX)
@@ -91,6 +93,8 @@ export async function createAssetAction(formData: FormData) {
         status: input.status,
         imagePath: input.imagePath,
         documentPath: input.documentPath,
+        locationX: input.locationX,
+        locationY: input.locationY,
       },
     });
 
@@ -102,6 +106,12 @@ export async function createAssetAction(formData: FormData) {
         changedBy: actor.name || actor.email,
       },
     });
+
+    await sendSlackAlert(
+      "Asset Registered",
+      `New asset registered: Tag: ${assetTag}, Name: ${asset.name}, Condition: ${asset.condition}.`,
+      "success"
+    );
 
     redirectWithToast(`Asset registered successfully with Tag ${assetTag}.`);
   } catch (error) {
@@ -133,6 +143,8 @@ export async function updateAssetAction(formData: FormData) {
       status: value(formData, "status"),
       imagePath: value(formData, "imagePath"),
       documentPath: value(formData, "documentPath"),
+      locationX: value(formData, "locationX"),
+      locationY: value(formData, "locationY"),
     });
 
     const currentAsset = await prisma.asset.findUnique({
@@ -177,6 +189,9 @@ export async function updateAssetAction(formData: FormData) {
     if (input.documentPath && currentAsset.documentPath !== input.documentPath) {
       changes.push(`New document uploaded: "${input.documentPath}"`);
     }
+    if (currentAsset.locationX !== input.locationX || currentAsset.locationY !== input.locationY) {
+      changes.push(`Floorplan coordinates changed`);
+    }
 
     await prisma.asset.update({
       where: { id },
@@ -192,6 +207,8 @@ export async function updateAssetAction(formData: FormData) {
         status: input.status,
         imagePath: input.imagePath,
         documentPath: input.documentPath,
+        locationX: input.locationX,
+        locationY: input.locationY,
       },
     });
 
@@ -204,6 +221,15 @@ export async function updateAssetAction(formData: FormData) {
           changedBy: actor.name || actor.email,
         },
       });
+
+      if (currentAsset.status !== input.status || currentAsset.condition !== input.condition) {
+        const isCritical = input.condition === "BROKEN" || input.status === "LOST";
+        await sendSlackAlert(
+          `Asset Status Updated - ${currentAsset.assetTag}`,
+          `Asset "${currentAsset.name}" updated by ${actor.name}:\n• Status: ${currentAsset.status} ➔ ${input.status}\n• Condition: ${currentAsset.condition} ➔ ${input.condition}`,
+          isCritical ? "danger" : "warning"
+        );
+      }
     }
 
     redirectWithToast(`Asset ${currentAsset.assetTag} updated successfully.`);

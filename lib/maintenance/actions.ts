@@ -3,6 +3,7 @@
 import { requireAuth } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { sendSlackAlert } from "@/lib/notifications/slack";
 
 function value(formData: FormData, key: string) {
   const formValue = formData.get(key);
@@ -54,6 +55,12 @@ export async function requestMaintenanceAction(formData: FormData) {
         },
       }),
     ]);
+
+    await sendSlackAlert(
+      `Maintenance Requested - ${asset.assetTag}`,
+      `New maintenance ticket requested by ${actor.name} for asset "${asset.name}":\n• Problem: "${description}"`,
+      "info"
+    );
 
     redirectWithToast(`Maintenance ticket registered for asset ${asset.assetTag}.`);
   } catch (error) {
@@ -304,6 +311,12 @@ export async function resolveMaintenanceAction(formData: FormData) {
         },
       }),
     ]);
+
+    await sendSlackAlert(
+      `Maintenance Resolved - ${ticket.asset.assetTag}`,
+      `Maintenance ticket for asset "${ticket.asset.name}" has been successfully completed by ${techName}.\n• Cost: ${cost !== null ? `$${cost.toFixed(2)}` : "N/A"}\n• Resolution Notes: "${notes || "None"}"\n• Asset status reverted to AVAILABLE.`,
+      "success"
+    );
 
     redirectWithToast(`Maintenance ticket resolved. Asset ${ticket.asset.assetTag} is available.`);
   } catch (error) {

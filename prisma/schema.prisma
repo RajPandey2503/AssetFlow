@@ -110,6 +110,8 @@ model Asset {
   sharedResource  Boolean        @default(false)
   imagePath       String?
   documentPath    String?
+  locationX       Float?
+  locationY       Float?
 
   status       AssetStatus @default(AVAILABLE)
 

@@ -40,6 +40,18 @@ export const assetSchema = z.object({
   status: z.nativeEnum(AssetStatus),
   imagePath: optionalString,
   documentPath: optionalString,
+  locationX: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? null : parseFloat(val)))
+    .nullable()
+    .optional(),
+  locationY: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? null : parseFloat(val)))
+    .nullable()
+    .optional(),
 });
 
 export type AssetInput = z.infer<typeof assetSchema>;

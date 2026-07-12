@@ -30,6 +30,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ToastFeedback } from "@/components/organization/toast-feedback";
 import { AllocateDialog } from "@/components/allocation/allocate-dialog";
 import { TransferDialog } from "@/components/allocation/transfer-dialog";
+import { ReceiptButton } from "@/components/allocation/receipt-button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   returnAssetAction,
@@ -386,7 +387,16 @@ async function AllocationHistoryTab({ q, page }: { q: string; page: number }) {
     prisma.assetAllocation.findMany({
       where,
       include: {
-        asset: { select: { assetTag: true, name: true } },
+        asset: {
+          select: {
+            assetTag: true,
+            name: true,
+            serialNumber: true,
+            condition: true,
+            location: true,
+            category: { select: { name: true } },
+          },
+        },
         user: { select: { name: true, email: true } },
       },
       orderBy: { allocatedAt: "desc" },
@@ -448,6 +458,7 @@ async function AllocationHistoryTab({ q, page }: { q: string; page: number }) {
                   <TableHead className="font-semibold text-slate-800">Allocated At</TableHead>
                   <TableHead className="font-semibold text-slate-800">Returned At</TableHead>
                   <TableHead className="font-semibold text-slate-800">Allocation Status</TableHead>
+                  <TableHead className="font-semibold text-slate-800 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -491,6 +502,23 @@ async function AllocationHistoryTab({ q, page }: { q: string; page: number }) {
                             Active Assignment
                           </Badge>
                         )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <ReceiptButton
+                          allocation={{
+                            id: alloc.id,
+                            assetTag: alloc.asset.assetTag,
+                            assetName: alloc.asset.name,
+                            serialNumber: alloc.asset.serialNumber,
+                            categoryName: alloc.asset.category?.name || "Equipment",
+                            assignedTo: alloc.user.name,
+                            assignedToEmail: alloc.user.email,
+                            allocatedAt: allocatedDateStr,
+                            returnDate: alloc.returnDate ? new Date(alloc.returnDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null,
+                            condition: alloc.asset.condition,
+                            location: alloc.asset.location,
+                          }}
+                        />
                       </TableCell>
                     </TableRow>
                   );

@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
-import { ClipboardCheck, ShieldCheck } from "lucide-react";
+import React, { useState } from "react";
+import { ClipboardCheck, ShieldCheck, Scan } from "lucide-react";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { Button } from "@/components/ui/button";
+import { ScannerDialog } from "@/components/ui/scanner-dialog";
 import {
   Dialog,
   DialogContent,
@@ -119,6 +120,9 @@ type VerifyItemProps = {
 };
 
 export function VerifyAuditItemDialog({ itemId, assetTag, assetName, trigger }: VerifyItemProps) {
+  const [statusVal, setStatusVal] = useState("VERIFIED");
+  const [scannedTag, setScannedTag] = useState<string | null>(null);
+
   return (
     <Dialog>
       <DialogTrigger render={trigger} />
@@ -137,12 +141,48 @@ export function VerifyAuditItemDialog({ itemId, assetTag, assetName, trigger }: 
         <form action={verifyAuditItemAction} className="space-y-4">
           <input type="hidden" name="itemId" value={itemId} />
 
+          {/* Verification Scanner */}
+          <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-slate-500">Scan Verification Check:</span>
+              <ScannerDialog
+                placeholderPrefix="AF-"
+                onScan={(val) => {
+                  setScannedTag(val);
+                  if (val === assetTag) {
+                    setStatusVal("VERIFIED");
+                  }
+                }}
+                trigger={
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-[10px] gap-1 bg-white hover:bg-slate-50">
+                    <Scan className="size-3 text-indigo-500" />
+                    Scan Asset Barcode
+                  </Button>
+                }
+              />
+            </div>
+            {scannedTag && (
+              <div className="flex justify-between items-center pt-1.5 border-t border-slate-150">
+                <span className="font-medium text-slate-550">Scanned Tag:</span>
+                <span className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10px] ${scannedTag === assetTag ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                  {scannedTag} {scannedTag === assetTag ? '✓ MATCH' : '✗ MISMATCH'}
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* Verification Status */}
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="verify-status">
               Verification Status *
             </label>
-            <Select id="verify-status" name="status" required defaultValue="VERIFIED">
+            <Select
+              id="verify-status"
+              name="status"
+              required
+              value={statusVal}
+              onChange={(e) => setStatusVal(e.target.value)}
+            >
               <option value="VERIFIED">Present & Verified (Good/Normal)</option>
               <option value="MISSING">Missing (Lost/Untraceable)</option>
               <option value="DAMAGED">Damaged (Broken/Poor condition)</option>
