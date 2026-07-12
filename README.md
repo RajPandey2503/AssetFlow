@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AssetFlow ERP 🚀
 
-## Getting Started
+AssetFlow is an enterprise-grade Asset Management & Operations Resource Planning (ERP) platform. It provides complete visibility, booking schedulers, compliance audit tracks, maintenance ticketing boards, and real-time alerts.
 
-First, run the development server:
+---
 
+## 🌟 Core Modules & Features
+
+### 1. 📋 Asset Registration & Directory
+* **Strong Inventory Controls**: Unique sequential asset tags (`AF-0001`, `AF-0002`...) are auto-generated.
+* **Rich Metadata Support**: Trace category classifications, serial numbers, acquisition date, cost valuation, physical location, and shared resource status.
+* **Attachments placeholder**: Supports mock image uploads and warranty/manual document references.
+* **Search & Filter Shelf**: Instantly filter assets by category, status, condition, or query.
+
+### 2. 🤝 Asset Allocation & Transfers
+* **Prevent Double-Allocation**: Strong transactional actions prevent double assignment.
+* **Transfer Approvals**: Handover request workflow to transfer assets between employees, with administrator approval triggers.
+* **Return logs**: Handles expected return dates, actual returns, and automatic status updates.
+
+### 3. 📅 Resource Booking & Calendar
+* **Shared Scheduler**: Monthly calendar grid visualizing booking slots for shared assets.
+* **Overlap Validation**: Multi-tenant booking validations block reservation overlaps.
+* **Reminders**: One-click reminder notifications dispatch warnings for upcoming bookings.
+
+### 4. 🔧 Maintenance Kanban Board
+* **Kanban Board**: Track maintenance tickets through statuses (`PENDING` ➔ `APPROVED` ➔ `TECHNICIAN ASSIGNED` ➔ `IN PROGRESS` ➔ `RESOLVED`).
+* **Auto Status Sync**: Automatically moves assets to `MAINTENANCE` during repairs, and reverts them to `AVAILABLE` on resolution.
+* **Cost & Notes Tracking**: Tracks repair costs and resolution logs for audit trails.
+
+### 5. 🔍 Compliance Audit Cycles
+* **Scope Auditor Cycles**: Create scheduled audits assigning specific employees to verify list items.
+* **Discrepancy Reporting**: Audit items marked as `MISSING` automatically transition the database status to `LOST`. Items marked as `DAMAGED` trigger conditions to `BROKEN` and log discrepancies.
+
+### 6. 📊 Reports & Analytics
+* **Recharts Panels**: Dynamic reports visualizing utilization charts, department summaries, repair trends, and weekly scheduling heatmaps.
+* **CSV Exporter**: Expose formatted data grids to spreadsheet sheets.
+
+### 7. 🔔 Notifications Center
+* **Header Alerts Popover**: Notifications showing overdue returns, upcoming bookings, and maintenance requests.
+* **Live Audit Trails**: Live database-driven timeline showing history actions (`AssetHistory`).
+
+---
+
+## 🚀 Premium Enterprise Enhancements
+
+### 1. 🔄 Database Portability Switcher
+Supports local lightweight SQLite and serverless-ready cloud PostgreSQL connections.
+* **Runtime Driver Detection**: Instantiates appropriate connection adapters dynamically at runtime.
+* **CLI Switcher Script**: Swaps provider and rebuilds Prisma types:
+  ```bash
+  node scripts/switch-db.js postgres  # Switch schema source to PostgreSQL
+  node scripts/switch-db.js sqlite    # Revert schema source to SQLite
+  ```
+
+### 2. 📷 Barcode & QR Scanner Viewport
+* Simulated WebRTC camera viewbox modal with scanner lasers.
+* Integrates next to the **Serial Number** input inside forms.
+* Integrated in **Audit Verifications** (pre-selects present status on successful matches).
+
+### 3. 📄 Handover PDF Receipts
+* Print handover receipt button on all allocation rows.
+* Generates a styled handover voucher, T&C terms list, and signature sign-offs, launching browser print layouts.
+
+### 4. 📍 Office Floorplan Pins
+* Interactive SVG floor blueprint (Server room, Breakroom, Open workspaces, Conference Room Alpha, Executive Offices).
+* Pins coordinates X/Y to database schemas and maps them inside detail sheets.
+
+### 5. 💬 Slack Alert Webhooks
+* Fires notifications to Slack channels on registration, repairs, or discrepancies.
+* **Setup**: Add `SLACK_WEBHOOK_URL` to `.env`. Falls back to styled mock console grids in local environments.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+* **Core**: Next.js 16 (Turbopack) & React 19 (Server Actions)
+* **Styling**: Tailwind CSS & Shadcn/Radix Primitives
+* **Database & ORM**: Prisma ORM with SQLite (`dev.db`) or cloud PostgreSQL
+* **Charts**: Recharts Vector Visualizations
+
+---
+
+## ⚙️ Getting Started & Local Run
+
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Database Sync
+```bash
+npx prisma db push
+npx prisma generate
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Start Development Server
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) to view the portal.
