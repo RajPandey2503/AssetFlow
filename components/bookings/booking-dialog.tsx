@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { createBookingAction } from "@/lib/bookings/actions";
+import { useSearchParams } from "next/navigation";
 
 type BookingDialogProps = {
   assets: { id: string; assetTag: string; name: string }[];
@@ -24,6 +25,10 @@ type BookingDialogProps = {
 };
 
 export function BookingDialog({ assets, employees, defaultOpen }: BookingDialogProps) {
+  const searchParams = useSearchParams();
+  const dateParam = searchParams.get("date");
+  const defaultStart = dateParam ? `${dateParam}T09:00` : "";
+  const defaultEnd = dateParam ? `${dateParam}T17:00` : "";
   // Format current datetime for min date input (YYYY-MM-DDTHH:MM)
   const getMinDateTimeString = () => {
     const now = new Date();
@@ -97,6 +102,7 @@ export function BookingDialog({ assets, employees, defaultOpen }: BookingDialogP
                 type="datetime-local"
                 min={getMinDateTimeString()}
                 required
+                defaultValue={defaultStart}
               />
             </div>
 
@@ -111,6 +117,7 @@ export function BookingDialog({ assets, employees, defaultOpen }: BookingDialogP
                 type="datetime-local"
                 min={getMinDateTimeString()}
                 required
+                defaultValue={defaultEnd}
               />
             </div>
           </div>

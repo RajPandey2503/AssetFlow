@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, User, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,10 +42,17 @@ const monthNames = [
 ];
 
 export function CalendarView({ bookings }: CalendarViewProps) {
+  const router = useRouter();
   const now = new Date();
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [selectedBooking, setSelectedBooking] = useState<CalendarBooking | null>(null);
+
+  const handleDayClick = (day: number) => {
+    const monthStr = String(currentMonth + 1).padStart(2, "0");
+    const dayStr = String(day).padStart(2, "0");
+    router.push(`/bookings?new=true&date=${currentYear}-${monthStr}-${dayStr}`);
+  };
 
   // Month navigation
   const prevMonth = () => {
@@ -140,7 +148,8 @@ export function CalendarView({ bookings }: CalendarViewProps) {
           return (
             <div
               key={`day-${day}`}
-              className={`border border-slate-100 rounded-lg min-h-[50px] lg:min-h-[95px] p-1 lg:p-2 flex flex-col justify-between hover:bg-slate-50/30 transition-all ${
+              onClick={() => handleDayClick(day)}
+              className={`border border-slate-100 rounded-lg min-h-[50px] lg:min-h-[95px] p-1 lg:p-2 flex flex-col justify-between hover:bg-indigo-50/20 hover:border-indigo-200 transition-all cursor-pointer ${
                 isToday ? "bg-indigo-50/40 border-indigo-200 ring-1 ring-indigo-200" : "bg-white"
               }`}
             >
@@ -156,7 +165,10 @@ export function CalendarView({ bookings }: CalendarViewProps) {
                 {dayBookings.slice(0, 3).map((b) => (
                   <button
                     key={b.id}
-                    onClick={() => setSelectedBooking(b)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedBooking(b);
+                    }}
                     className={`w-full block truncate text-[9px] font-semibold text-white px-1.5 py-0.5 rounded transition-all text-left cursor-pointer ${
                       statusColors[b.status] || "bg-slate-400"
                     }`}
@@ -177,7 +189,10 @@ export function CalendarView({ bookings }: CalendarViewProps) {
                 {dayBookings.slice(0, 3).map((b) => (
                   <button
                     key={b.id}
-                    onClick={() => setSelectedBooking(b)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedBooking(b);
+                    }}
                     className={`size-1.5 rounded-full cursor-pointer ${
                       b.status === "UPCOMING" ? "bg-emerald-500" :
                       b.status === "ONGOING" ? "bg-blue-500" :
