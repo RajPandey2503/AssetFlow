@@ -124,6 +124,25 @@ export async function getCurrentUser() {
 }
 
 export async function requireAuth() {
+  if (process.env.MOCK_USER_ROLE) {
+    const role = process.env.MOCK_USER_ROLE as UserRole;
+    let mockUser = await prisma.user.findFirst({
+      where: { role },
+    });
+    if (!mockUser) {
+      mockUser = await prisma.user.create({
+        data: {
+          name: "Mock Admin User",
+          email: "mockadmin@example.com",
+          role,
+          password: "mockpassword123",
+          status: "ACTIVE",
+        },
+      });
+    }
+    return mockUser;
+  }
+
   const user = await getCurrentUser();
 
   if (!user) {
