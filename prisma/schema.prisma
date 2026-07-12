@@ -5,5 +5,100 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+}
+
+enum AssetStatus {
+  AVAILABLE
+  ALLOCATED
+  RESERVED
+  MAINTENANCE
+  LOST
+  RETIRED
+}
+
+enum UserRole {
+  ADMIN
+  ASSET_MANAGER
+  DEPARTMENT_HEAD
+  EMPLOYEE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+
+  employees User[]
+  assets    Asset[]
+
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id                       String     @id @default(cuid())
+  name                     String
+  email                    String     @unique
+  password                 String
+  role                     UserRole   @default(EMPLOYEE)
+  status                   UserStatus @default(ACTIVE)
+  resetPasswordTokenHash   String?
+  resetPasswordExpiresAt   DateTime?
+  lastLoginAt              DateTime?
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  allocations  AssetAllocation[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AssetCategory {
+  id     String @id @default(cuid())
+  name   String @unique
+
+  assets Asset[]
+}
+
+model Asset {
+  id           String @id @default(cuid())
+
+  assetTag     String @unique
+  name         String
+
+  serialNumber String?
+
+  status       AssetStatus @default(AVAILABLE)
+
+  categoryId   String
+  category     AssetCategory @relation(fields: [categoryId], references: [id])
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  allocations  AssetAllocation[]
+
+  createdAt    DateTime @default(now())
+}
+
+model AssetAllocation {
+  id          String @id @default(cuid())
+
+  assetId     String
+  asset       Asset @relation(fields: [assetId], references: [id])
+
+  userId      String
+  user        User @relation(fields: [userId], references: [id])
+
+  allocatedAt DateTime @default(now())
+  returnDate  DateTime?
+
+  returned    Boolean @default(false)
 }

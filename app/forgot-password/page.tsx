@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { LoginForm } from "@/components/auth/login-form";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { getCurrentUser } from "@/lib/auth/session";
 
-export default async function LoginPage() {
+export default async function ForgotPasswordPage() {
   const user = await getCurrentUser();
 
   if (user) {
@@ -12,10 +12,10 @@ export default async function LoginPage() {
 
   return (
     <AuthShell
-      title="Sign in"
-      description="Use your AssetFlow credentials to access the ERP workspace."
+      title="Reset password"
+      description="Enter your account email and AssetFlow will prepare reset instructions."
     >
-      <LoginForm />
+      <ForgotPasswordForm />
     </AuthShell>
   );
 }
