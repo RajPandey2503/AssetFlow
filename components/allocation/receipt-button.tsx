@@ -174,9 +174,16 @@ export function ReceiptButton({ allocation }: ReceiptButtonProps) {
       <body>
         <div class="header">
           <div class="logo">Asset<span>Flow</span></div>
-          <div class="title">
-            <h1>Handover Receipt</h1>
-            <p>Receipt ID: HO-${allocation.id.substring(0, 8).toUpperCase()}</p>
+          <div style="display: flex; gap: 15px; align-items: center;">
+            <img 
+              src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(allocation.assetTag)}" 
+              alt="Asset QR Code" 
+              style="width: 50px; height: 50px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px;"
+            />
+            <div class="title">
+              <h1>Handover Receipt</h1>
+              <p>Receipt ID: HO-${allocation.id.substring(0, 8).toUpperCase()}</p>
+            </div>
           </div>
         </div>
 

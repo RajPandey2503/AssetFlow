@@ -180,6 +180,29 @@ export function AssetDetailsSheet({ asset, trigger }: AssetDetailsSheetProps) {
             </div>
           </div>
 
+          {/* QR Code Identifier Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                Asset QR Identifier
+              </span>
+              <h4 className="text-sm font-semibold text-slate-850">{asset.assetTag}</h4>
+              <p className="text-[10px] text-muted-foreground max-w-[220px] leading-relaxed">
+                Scan barcode tag to instantly inspect asset operations or update logs.
+              </p>
+            </div>
+            
+            <div className="bg-slate-50 border border-slate-100 rounded-lg p-1.5 flex items-center justify-center shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(asset.assetTag)}`} 
+                alt={`QR code for ${asset.assetTag}`}
+                className="size-16"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
           {/* Files / Attachments Section */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
